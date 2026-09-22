@@ -1,0 +1,7 @@
+<p>Please complete all of the steps on this page:</p>
+<ul>
+  <li>Create An Invoice</li>
+</ul>
+<%= form_for(:customer, url: customer_path, method: :put) do |f| %>
+  <%= f.submit "Complete Process" %>
+<% end %>

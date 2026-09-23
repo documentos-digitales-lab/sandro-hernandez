@@ -1,4 +1,5 @@
 class Invoice < ApplicationRecord
+  belongs_to :customer
   has_many :items, dependent: :destroy
   accepts_nested_attributes_for :items,
     reject_if: ->(attrs) { !attrs["quantity"].to_s.empty? && attrs["quantity"].to_i <= 0 }

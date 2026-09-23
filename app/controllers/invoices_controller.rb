@@ -20,6 +20,10 @@ class InvoicesController < ApplicationController
     end
   rescue ActiveRecord::RecordNotUnique
     redirect_to invoice_path(current_customer.invoices.find_by!(uuid: @invoice.uuid))
+  rescue ActionController::ParameterMissing
+    @invoice = current_customer.invoices.new
+    fill_missing_items
+    render :new, status: :unprocessable_entity
   end
 
   def show

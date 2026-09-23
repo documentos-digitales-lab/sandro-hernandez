@@ -1,3 +1,7 @@
 class Customer < ApplicationRecord
-  validates :rfc, presence: true
+  has_many :invoices, dependent: :destroy
+
+  before_validation { self.rfc = rfc.to_s.strip.upcase }
+
+  validates :rfc, presence: true, uniqueness: true
 end

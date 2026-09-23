@@ -1,0 +1,13 @@
+class CreateInvoices < ActiveRecord::Migration[7.0]
+  def change
+    create_table :invoices do |t|
+      t.references :customer, null: false, foreign_key: true
+      t.string :uuid
+      t.decimal :subtotal, precision: 10, scale: 2
+      t.decimal :tax, precision: 10, scale: 2
+      t.decimal :total, precision: 10, scale: 2
+      t.timestamps
+    end
+    add_index :invoices, :uuid, unique: true
+  end
+end

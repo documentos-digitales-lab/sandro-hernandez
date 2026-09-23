@@ -11,7 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2023_10_16_202411) do
-  create_table "customers", charset: "utf8", force: :cascade do |t|
+  create_table "customers", charset: "utf8mb3", force: :cascade do |t|
     t.string "rfc"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -1,7 +1,13 @@
-<p>Please complete all of the steps on this page:</p>
-<ul>
-  <li><%= link_to "Create An Invoice", new_invoice_path %></li>
-</ul>
-<%= form_for(:customer, url: customer_path, method: :put) do |f| %>
-  <%= f.submit "Complete Process" %>
-<% end %>
+<div class="container py-5" style="max-width: 680px;">
+  <div class="mb-1">
+    <h1 class="fw-bold mb-1">Welcome, RFC <%= @customer.rfc %></h1>
+    <p class="text-muted mb-0">Please complete all of the steps on this page:</p>
+  </div>
+  <ul>
+    <li><%= link_to "Create An Invoice", new_invoice_path %></li>
+    <li><%= link_to "View Invoices", invoices_path %></li>
+  </ul>
+  <%= form_for(:customer, url: customer_path, method: :put) do |f| %>
+    <%= f.submit "Complete Process" %>
+  <% end %>
+</div>

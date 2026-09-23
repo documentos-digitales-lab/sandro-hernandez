@@ -1,3 +1,29 @@
-<%= form_for(:customer, url: customers_path) do |f| %>
-  <%= f.submit "Start app" %>
-<% end %>
+<div class="container py-5" style="max-width: 480px;">
+  <div class="card">
+    <div class="card-body">
+      <h1 class="h4 fw-bold mb-1">Create an account</h1>
+      <p class="text-muted mb-4">Register with your RFC to start using the app.</p>
+
+      <% if @customer&.errors&.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @customer.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_for(:customer, url: customers_path, class: "d-flex flex-column gap-3") do |f| %>
+        <div>
+          <%= f.label :rfc, "RFC", class: "form-label fw-semibold" %>
+          <%= f.text_field :rfc, class: "form-control", required: true, autocomplete: "off" %>
+        </div>
+        <%= f.submit "Register", class: "btn btn-primary w-100 py-2 fw-semibold" %>
+      <% end %>
+
+      <hr>
+      <p class="text-muted mb-0">Already have an account? <%= link_to "Log in", new_session_path %></p>
+    </div>
+  </div>
+</div>

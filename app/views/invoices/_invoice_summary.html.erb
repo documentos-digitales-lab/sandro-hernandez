@@ -2,37 +2,39 @@
   <%= render "additional_taxes_banner", additional_taxes: additional_taxes %>
 </div>
 
-<table class="table align-middle">
-  <thead>
-    <tr class="text-uppercase text-muted small">
-      <th>Item</th>
-      <th>Product / Service</th>
-      <th>Quantity</th>
-      <th>Unit price</th>
-      <th class="text-end">Amount</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% items.each_with_index do |item, index| %>
-      <tr>
-        <td class="fw-semibold">Item No. <%= index + 1 %></td>
-        <td><%= item.description %></td>
-        <td><%= item.quantity %></td>
-        <td><%= number_to_currency(item.unit_price) %></td>
-        <td class="text-end"><%= number_to_currency(item.amount) %></td>
+<div class="card">
+  <table class="table align-middle mb-0">
+    <thead>
+      <tr class="text-uppercase text-muted small">
+        <th>Item</th>
+        <th>Product / Service</th>
+        <th>Quantity</th>
+        <th>Unit price</th>
+        <th class="text-end">Amount</th>
       </tr>
-    <% end %>
-    <tr>
-      <td colspan="4" class="text-end">Subtotal</td>
-      <td class="text-end"><%= number_to_currency(taxes.subtotal) %></td>
-    </tr>
-    <tr>
-      <td colspan="4" class="text-end">Tax</td>
-      <td class="text-end"><%= number_to_currency(taxes.tax) %></td>
-    </tr>
-    <tr>
-      <td colspan="4" class="text-end fw-semibold">Total</td>
-      <td class="text-end fw-semibold"><%= number_to_currency(taxes.total) %></td>
-    </tr>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% items.each_with_index do |item, index| %>
+        <tr>
+          <td class="fw-semibold">Item No. <%= index + 1 %></td>
+          <td><%= item.description %></td>
+          <td><%= item.quantity %></td>
+          <td><%= number_to_currency(item.unit_price) %></td>
+          <td class="text-end"><%= number_to_currency(item.amount) %></td>
+        </tr>
+      <% end %>
+      <tr>
+        <td colspan="4" class="text-end">Subtotal</td>
+        <td class="text-end"><%= number_to_currency(taxes.subtotal) %></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="text-end">Tax</td>
+        <td class="text-end"><%= number_to_currency(taxes.tax) %></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="text-end fw-semibold">Total</td>
+        <td class="text-end fw-semibold"><%= number_to_currency(taxes.total) %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

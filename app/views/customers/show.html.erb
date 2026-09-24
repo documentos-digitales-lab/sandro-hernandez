@@ -1,12 +1,39 @@
 <div class="container py-5" style="max-width: 680px;">
-  <div class="mb-1">
-    <p class="text-muted mb-0">Please complete all of the steps on this page:</p>
+  <div class="d-flex align-items-center gap-3 mb-5">
+    <% if current_user_profile.present? %>
+      <img src="<%= current_user_profile.image_url %>" alt="avatar" class="rounded-circle" width="48" height="48">
+      <div>
+        <h1 class="h4 fw-bold mb-0"><%= current_user_profile.full_name %></h1>
+        <p class="text-muted mb-0">Welcome back — a few steps left to finish your setup.</p>
+      </div>
+    <% else %>
+      <div>
+        <h1 class="h4 fw-bold mb-0">Welcome</h1>
+        <p class="text-muted mb-0">RFC <%= current_customer.rfc %> — a few steps left to finish your setup.</p>
+      </div>
+    <% end %>
   </div>
-  <ul>
-    <li><%= link_to "Create An Invoice", new_invoice_path %></li>
-    <li><%= link_to "View Invoices", invoices_path %></li>
-  </ul>
+
+  <p class="text-muted">Please complete all of the steps on this page:</p>
+
+  <div class="list-group mb-4">
+    <%= link_to new_invoice_path, class: "list-group-item list-group-item-action d-flex align-items-center justify-content-between py-3" do %>
+      <span>
+        <span class="fw-semibold d-block">Create An Invoice</span>
+        <span class="text-muted small">Add your products and generate a new invoice</span>
+      </span>
+      <span aria-hidden="true">&rarr;</span>
+    <% end %>
+    <%= link_to invoices_path, class: "list-group-item list-group-item-action d-flex align-items-center justify-content-between py-3" do %>
+      <span>
+        <span class="fw-semibold d-block">View Invoices</span>
+        <span class="text-muted small">Browse your invoices and their totals</span>
+      </span>
+      <span aria-hidden="true">&rarr;</span>
+    <% end %>
+  </div>
+
   <%= form_for(:customer, url: customer_path, method: :put) do |f| %>
-    <%= f.submit "Complete Process" %>
+    <%= f.submit "Complete Process", class: "btn btn-primary w-100 py-2 fw-semibold" %>
   <% end %>
 </div>

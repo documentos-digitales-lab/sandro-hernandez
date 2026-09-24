@@ -1,13 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Mirrors of service constants: InvoiceTaxCalculator::TAX_RATE and
-// AdditionalTaxesChecker::HIGH_TAX_THRESHOLD. The server is the authority
-// at create/show — this only provides live preview feedback.
-const TAX_RATE = 0.16
-const HIGH_TAX_THRESHOLD = 2000
-
 export default class extends Controller {
-  static values = { flash: { type: Array, default: [] } }
+  static values = {
+    flash: { type: Array, default: [] },
+    taxRate: { type: Number, default: 0.16 },
+    highTaxThreshold: { type: Number, default: 2000 },
+    requiredMessage: String,
+    okMessage: String
+  }
 
   static targets = ["quantity", "price", "amount", "description", "subtotal", "tax", "total", "banner", "submit"]
 
@@ -61,7 +61,7 @@ export default class extends Controller {
 
   updateTotals() {
     const subtotal = this.rowAmounts().reduce((sum, value) => sum + value, 0)
-    const tax = subtotal * TAX_RATE
+    const tax = subtotal * this.taxRateValue
 
     this.subtotalTarget.textContent = this.formatMoney(subtotal)
     this.taxTarget.textContent = this.formatMoney(tax)
@@ -69,11 +69,11 @@ export default class extends Controller {
   }
 
   updateTaxAssessment() {
-    const requiresAdditionalTaxes = this.perProductTaxes().some((tax) => tax > HIGH_TAX_THRESHOLD)
+    const requiresAdditionalTaxes = this.perProductTaxes().some((tax) => tax > this.highTaxThresholdValue)
     const alertClass = requiresAdditionalTaxes ? "alert-warning" : "alert-success"
     const message = requiresAdditionalTaxes
-      ? "Additional taxes are needed for this invoice."
-      : "No additional taxes are needed."
+      ? this.requiredMessageValue
+      : this.okMessageValue
 
     this.bannerTarget.innerHTML =
       `<div class="alert ${alertClass} mb-0" role="alert">${message}</div>`
@@ -82,7 +82,7 @@ export default class extends Controller {
   }
 
   perProductTaxes() {
-    return this.rowAmounts().map((amount) => amount * TAX_RATE)
+    return this.rowAmounts().map((amount) => amount * this.taxRateValue)
   }
 
   rowAmounts() {

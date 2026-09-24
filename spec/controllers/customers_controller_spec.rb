@@ -5,7 +5,6 @@ RSpec.describe CustomersController, type: :controller do
     it { should route(:get, "/customers/new").to(action: :new) }
     it { should route(:post, "/customers").to(action: :create) }
     it { should route(:get, "/customers/1").to(action: :show, id: 1) }
-    it { should route(:put, "/customers/1").to(action: :update, id: 1) }
   end
 
   describe "authentication" do
@@ -16,9 +15,6 @@ RSpec.describe CustomersController, type: :controller do
 
     it "redirects unauthenticated requests for protected actions" do
       get :show, params: { id: 1 }
-      expect(response).to redirect_to(new_session_path)
-
-      put :update, params: { id: 1 }
       expect(response).to redirect_to(new_session_path)
     end
   end
@@ -69,23 +65,21 @@ RSpec.describe CustomersController, type: :controller do
   end
 
   describe "GET #show" do
-    before { session[:customer_id] = create(:customer).id }
+    let(:customer) { create(:customer) }
 
-    it "renders the current customer page" do
-      get :show, params: { id: 1 }
+    before { session[:customer_id] = customer.id }
+
+    it "renders the current customer dashboard for their own path" do
+      get :show, params: { id: customer.id }
 
       expect(response).to render_template(:show)
       expect(response).to render_with_layout(:application)
     end
-  end
 
-  describe "PUT #update" do
-    before { session[:customer_id] = create(:customer).id }
+    it "redirects to the canonical dashboard when the id does not match" do
+      get :show, params: { id: customer.id + 1 }
 
-    it "redirects to the new customer page" do
-      put :update, params: { id: session[:customer_id] }
-
-      expect(response).to redirect_to new_customer_path
+      expect(response).to redirect_to(customer_path(customer))
     end
   end
 end

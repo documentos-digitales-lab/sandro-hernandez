@@ -5,6 +5,8 @@ class CustomersController < ApplicationController
   end
 
   def show
+    redirect_to(customer_path(current_customer)) if params[:id] != current_customer.id.to_s
+
     @customer = current_customer
   end
 
@@ -16,11 +18,6 @@ class CustomersController < ApplicationController
     else
       render :new
     end
-  end
-
-  def update
-    Customer.find(params[:id])
-    redirect_to new_customer_path
   end
 
   private

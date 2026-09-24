@@ -7,8 +7,7 @@
     <%= link_to "Back to invoices", invoices_path, class: "btn btn-outline-secondary py-2 fw-semibold" %>
   </div>
 
-  <%= render "invoice_summary",
-        items: @invoice.items,
-        taxes: @taxes,
-        additional_taxes: @additional_taxes %>
+<%= render "invoice_summary",
+      invoice: @invoice,
+      additional_taxes: @additional_taxes %>
 </div>

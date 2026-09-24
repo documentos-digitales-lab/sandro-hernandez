@@ -7,8 +7,8 @@
   <%= form_with(model: @invoice, class: "card",
       data: { controller: "invoice-form",
               invoice_form_flash_value: @invoice.errors.full_messages.to_json,
-              invoice_form_tax_rate_value: InvoiceTaxCalculator::TAX_RATE,
-              invoice_form_high_tax_threshold_value: AdditionalTaxesChecker::HIGH_TAX_THRESHOLD,
+              invoice_form_tax_rate_value: InvoiceConfig.tax_rate,
+              invoice_form_high_tax_threshold_value: InvoiceConfig.high_tax_threshold,
               invoice_form_required_message_value: additional_taxes_message(true),
               invoice_form_ok_message_value: additional_taxes_message(false) }) do |f| %>
 

@@ -1,6 +1,4 @@
 class AdditionalTaxesChecker
-  HIGH_TAX_THRESHOLD = BigDecimal("2000")
-
   def self.call(invoice)
     new(invoice).call
   end
@@ -10,7 +8,7 @@ class AdditionalTaxesChecker
   end
 
   def call
-    InvoiceTaxCalculator.call(invoice).tax_per_product.any? { |tax| tax > HIGH_TAX_THRESHOLD }
+    InvoiceTaxCalculator.call(invoice).tax_per_product.any? { |tax| tax > InvoiceConfig.high_tax_threshold }
   end
 
   private

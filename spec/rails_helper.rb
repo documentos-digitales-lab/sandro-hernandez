@@ -6,6 +6,7 @@ require File.expand_path('../config/environment', __dir__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 require "shoulda/matchers"
+require "database_cleaner/active_record"
 
 begin
   ActiveRecord::Migration.maintain_test_schema!
@@ -23,9 +24,25 @@ end
 RSpec.configure do |config|
   config.include Features, type: :feature
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
-  config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
+  config.use_transactional_fixtures = false
+
+  config.before(:suite) { DatabaseCleaner.clean_with(:truncation) }
+  config.after(:suite) { DatabaseCleaner.clean_with(:truncation) }
+
+  config.before(:each, type: :system) do
+    driven_by :selenium, using: :headless_chrome
+  end
+
+  config.before(:each) do |example|
+    DatabaseCleaner.strategy = example.metadata[:type] == :system ? :truncation : :transaction
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
 
   if Bullet.enable?
     config.before(:each) do

@@ -9,8 +9,8 @@ FactoryBot.define do
     to_create { |invoice| invoice.save!(validate: false) }
 
     trait :with_item do
-      after(:create) do |invoice|
-        create(:item, invoice: invoice, description: "Product", quantity: 1, unit_price: 1000)
+      after(:build) do |invoice|
+        invoice.items.build(description: "Product", quantity: 1, unit_price: 1000)
       end
     end
   end

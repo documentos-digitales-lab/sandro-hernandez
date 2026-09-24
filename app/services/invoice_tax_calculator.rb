@@ -12,7 +12,7 @@ class InvoiceTaxCalculator
   end
 
   def call
-    amounts = items.map { |li| (li.amount || 0).round(2) }
+    amounts = items.map { |li| li.amount.round(2) }
     subtotal = amounts.sum.round(2)
     tax = (subtotal * TAX_RATE).round(2)
     Result.new(

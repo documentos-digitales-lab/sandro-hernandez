@@ -5,6 +5,6 @@ class Item < ApplicationRecord
   validates :unit_price, numericality: { greater_than_or_equal_to: 0 }
 
   def amount
-    (quantity || 0) * (unit_price || 0)
+    quantity * unit_price
   end
 end

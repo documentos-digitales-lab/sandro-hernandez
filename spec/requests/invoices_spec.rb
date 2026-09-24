@@ -83,7 +83,7 @@ RSpec.describe "Invoices", type: :request do
 
       expect(response).to have_http_status(:ok)
       mine.each { |invoice| expect(response.body).to include(invoice.uuid) }
-      expect(response.body).to include("2 invoice(s) for RFC #{customer.rfc}")
+      expect(response.body).to include("2 invoices for RFC #{customer.rfc}")
       expect(response.body).to include("1 product")
     end
 

@@ -53,14 +53,11 @@ RSpec.describe InvoiceTaxCalculator, type: :service do
       end
     end
 
-    context "with an amount that is not a number" do
-      it "treats missing amounts as zero instead of raising" do
+    context "with an item that is missing its unit price" do
+      it "is rejected by item validations so it never reaches the calculator" do
         invoice.items.build(description: "Incomplete", quantity: 1, unit_price: nil)
 
-        expect(result.subtotal).to eq(BigDecimal("0"))
-        expect(result.tax).to eq(BigDecimal("0"))
-        expect(result.total).to eq(BigDecimal("0"))
-        expect(result.tax_per_product).to eq([BigDecimal("0")])
+        expect(invoice).to be_invalid
       end
     end
 

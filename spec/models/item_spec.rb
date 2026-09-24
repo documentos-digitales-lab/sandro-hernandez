@@ -46,12 +46,12 @@ RSpec.describe Item, type: :model do
       expect(item.amount).to eq(BigDecimal("0.30"))
     end
 
-    it "returns zero for a zero quantity" do
+    it "returns zero quantity times price" do
       expect(build(:item, quantity: 0, unit_price: 10).amount).to eq(0)
     end
 
-    it "returns zero when the unit price is missing" do
-      expect(build(:item, unit_price: nil).amount).to eq(0)
+    it "is guarded by validations so nil prices never reach amount" do
+      expect(build(:item, unit_price: nil)).to be_invalid
     end
   end
 end

@@ -23,6 +23,8 @@ gem "jbuilder"
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
+# Pagination for the invoices list
+gem "pagy", "~> 6.4"
 
 
 group :development, :test do
@@ -47,8 +49,7 @@ end
 group :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15', '< 4.0'
-  gem 'selenium-webdriver'
-  gem "webdrivers", "~> 3.0"
+  gem 'selenium-webdriver', '~> 4.0'
   gem 'database_cleaner'
   gem 'launchy'
   gem 'rails-controller-testing'

@@ -27,23 +27,17 @@ RSpec.describe SessionsController, type: :controller do
         expect(session[:customer_id]).to eq(customer.id)
       end
 
-      it "stores the fetched user profile in the session" do
+      it "does not fetch the user profile at login (profile loads lazily)" do
         post :create, params: { rfc: "abc220101xyz" }
 
-        expect(session[:user_profile]).to eq(
-          "full_name" => "Emily Johnson",
-          "image_url" => "https://dummyjson.com/icon/emilys/128")
-      end
-
-      it "sets a one-shot welcome flash message" do
-        post :create, params: { rfc: "abc220101xyz" }
-
-        expect(flash[:welcome]).to eq("Welcome, Emily Johnson. It's so great to see you again.")
+        expect(session[:user_profile]).to be_nil
+        expect(flash[:welcome]).to be_nil
+        expect(response).to redirect_to(customer_path(customer))
       end
     end
 
-    context "when the profile API fails" do
-      it "still logs in but leaves the profile out of the session" do
+    context "when the profile API is unavailable" do
+      it "still logs in; the profile degrades gracefully on the next page" do
         stub_request(:get, DUMMY_USERS_URL).to_return(status: 500, body: "{}")
 
         post :create, params: { rfc: "abc220101xyz" }

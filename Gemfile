@@ -23,6 +23,8 @@ gem "jbuilder"
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
+# Pagination for the invoices list
+gem "pagy", "~> 6.4"
 
 
 group :development, :test do
@@ -32,21 +34,23 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem "rspec-rails", "~> 4.0.0.beta2"
+  gem 'bullet'
+  gem 'dotenv-rails'
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
   gem 'awesome_print'
-  gem 'bullet'
   gem 'dotenv-rails'
+  gem 'pry'
+  gem 'pry-nav'
 end
 
 group :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15', '< 4.0'
-  gem 'selenium-webdriver'
-  gem "webdrivers", "~> 3.0"
+  gem 'selenium-webdriver', '~> 4.0'
   gem 'database_cleaner'
   gem 'launchy'
   gem 'rails-controller-testing'

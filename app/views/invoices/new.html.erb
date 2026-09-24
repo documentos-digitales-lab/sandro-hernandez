@@ -1,0 +1,85 @@
+<div class="container py-5" style="max-width: 860px;">
+  <div class="mb-4">
+    <h1 class="fw-bold mb-1">Invoice</h1>
+    <p class="text-muted mb-0">Please add your products and click on Create:</p>
+  </div>
+
+  <%= form_with(model: @invoice, class: "card",
+      data: { controller: "invoice-form",
+              invoice_form_flash_value: @invoice.errors.full_messages.to_json,
+              invoice_form_tax_rate_value: InvoiceConfig.tax_rate,
+              invoice_form_high_tax_threshold_value: InvoiceConfig.high_tax_threshold,
+              invoice_form_required_message_value: additional_taxes_message(true),
+              invoice_form_ok_message_value: additional_taxes_message(false) }) do |f| %>
+
+    <div class="card-body">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr class="text-uppercase text-muted small">
+            <th class="col-1">Item</th>
+            <th class="col-2">Quantity</th>
+            <th class="col-4">Product / Service</th>
+            <th class="col-2">Unit price</th>
+            <th class="col-2 text-end">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="items">
+          <%= f.fields_for :items do |ff| %>
+            <tr>
+              <td class="fw-semibold">Item No. <%= ff.index + 1 %></td>
+              <td>
+                <%= ff.number_field :quantity,
+                      min: 0,
+                      class: bootstrap_field_class(ff.object, :quantity),
+                      aria_label: "Item #{ff.index + 1} Quantity",
+                      data: { invoice_form_target: "quantity", action: "input->invoice-form#update" } %>
+              </td>
+              <td>
+                <%= ff.text_field :description,
+                      placeholder: "Product or service",
+                      class: bootstrap_field_class(ff.object, :description),
+                      aria_label: "Item #{ff.index + 1} Product / Service",
+                      data: { invoice_form_target: "description" } %>
+              </td>
+              <td>
+                <%= ff.number_field :unit_price,
+                      min: 0, step: "0.01",
+                      class: bootstrap_field_class(ff.object, :unit_price),
+                      aria_label: "Item #{ff.index + 1} Unit price",
+                      data: { invoice_form_target: "price", action: "input->invoice-form#update" } %>
+              </td>
+              <td class="text-end fw-semibold" data-invoice-form-target="amount">$0.00</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div class="border-top pt-3 mt-3">
+        <div class="row justify-content-end">
+          <div class="col-sm-5">
+            <div class="d-flex justify-content-between py-1">
+              <span class="text-muted">Subtotal</span>
+              <strong data-invoice-form-target="subtotal">$0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+              <span class="text-muted">Tax</span>
+              <strong data-invoice-form-target="tax">$0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-top">
+              <span class="fw-semibold">Total</span>
+              <strong data-invoice-form-target="total">$0.00</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3" data-invoice-form-target="banner"></div>
+      </div>
+    </div>
+
+    <div class="card-footer bg-white">
+      <%= f.submit "Create Invoice",
+          class: "btn btn-primary w-100 py-2 fw-semibold",
+          data: { invoice_form_target: "submit" } %>
+    </div>
+  <% end %>
+</div>

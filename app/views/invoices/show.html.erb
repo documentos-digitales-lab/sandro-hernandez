@@ -1,0 +1,13 @@
+<div class="container py-5" style="max-width: 860px;">
+  <div class="d-flex align-items-end justify-content-between mb-4">
+    <div>
+      <h1 class="fw-bold mb-1">Invoice #<%= @invoice.id %></h1>
+      <p class="text-muted mb-0">UUID <span class="font-monospace"><%= @invoice.uuid %></span></p>
+    </div>
+    <%= link_to "Back to invoices", invoices_path, class: "btn btn-outline-secondary py-2 fw-semibold" %>
+  </div>
+
+<%= render "invoice_summary",
+      invoice: @invoice,
+      additional_taxes: @additional_taxes %>
+</div>

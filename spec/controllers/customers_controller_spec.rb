@@ -5,7 +5,18 @@ RSpec.describe CustomersController, type: :controller do
     it { should route(:get, "/customers/new").to(action: :new) }
     it { should route(:post, "/customers").to(action: :create) }
     it { should route(:get, "/customers/1").to(action: :show, id: 1) }
-    it { should route(:put, "/customers/1").to(action: :update, id: 1) }
+  end
+
+  describe "authentication" do
+    it "allows unauthenticated access to the registration actions" do
+      get :new
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "redirects unauthenticated requests for protected actions" do
+      get :show, params: { id: 1 }
+      expect(response).to redirect_to(new_session_path)
+    end
   end
 
   describe "GET #new" do
@@ -18,59 +29,57 @@ RSpec.describe CustomersController, type: :controller do
   end
 
   describe "POST #create" do
-    it "creates a new customer" do
-      expect { post(:create) }.to change(Customer, :count).by(1)
+    it "creates a new customer with the given RFC" do
+      expect {
+        post :create, params: { customer: { rfc: "ABC220101XYZ" } }
+      }.to change(Customer, :count).by(1)
     end
 
-    it "redirects to the customer show page" do
-      customer = create(:customer, id: 1, rfc: 'AAA010101000')
-      allow(Customer).to receive(:create).and_return(customer)
+    it "redirects to log in instead of auto-logging in" do
+      post :create, params: { customer: { rfc: "ABC220101XYZ" } }
 
-      post :create
+      expect(response).to redirect_to(new_session_path)
+      expect(session[:customer_id]).to be_nil
+    end
 
-      expect(Customer).to have_received(:create)
-      expect(response).to redirect_to customer_path(1)
+    it "re-renders the form when the RFC is invalid" do
+      post :create, params: { customer: { rfc: "" } }
+
+      expect(response).to render_template(:new)
+    end
+
+    it "re-renders the form when the RFC is already taken" do
+      create(:customer, rfc: "ABC220101XYZ")
+
+      post :create, params: { customer: { rfc: "ABC220101XYZ" } }
+
+      expect(response).to render_template(:new)
+      expect(assigns(:customer).errors[:rfc]).to include("has already been taken")
+    end
+
+    it "normalizes the RFC before storing it" do
+      post :create, params: { customer: { rfc: "  abc220101xyZ  " } }
+
+      expect(Customer.last.rfc).to eq("ABC220101XYZ")
     end
   end
 
   describe "GET #show" do
-    it "finds the customer" do
-      customer = create(:customer, id: 1)
-      allow(Customer).to receive(:find).with("1").and_return(customer)
+    let(:customer) { create(:customer) }
 
-      get :show, params: { id: 1 }
+    before { session[:customer_id] = customer.id }
 
-      expect(Customer).to have_received(:find).with("1")
-    end
-
-    it "shows the current customer" do
-      customer = create(:customer, id: 1)
-      allow(Customer).to receive(:create).and_return(customer)
-
-      get :show, params: { id: 1 }
+    it "renders the current customer dashboard for their own path" do
+      get :show, params: { id: customer.id }
 
       expect(response).to render_template(:show)
       expect(response).to render_with_layout(:application)
     end
-  end
 
-  describe "PUT #update" do
-    it "finds the customer" do
-      customer = create(:customer, id: 1)
-      allow(Customer).to receive(:find).with("1").and_return(customer)
+    it "redirects to the canonical dashboard when the id does not match" do
+      get :show, params: { id: customer.id + 1 }
 
-      put :update, params: { id: 1 }
-
-      expect(Customer).to have_received(:find).with("1")
-    end
-
-    it "redirects to the new customer page" do
-      customer = create(:customer, id: 1)
-      allow(Customer).to receive(:find).with("1").and_return(customer)
-
-      put :update, params: { id: 1 }
-
-      expect(response).to redirect_to new_customer_path
+      expect(response).to redirect_to(customer_path(customer))
     end
   end
 end

@@ -20,7 +20,17 @@
             class: "navbar-brand fw-semibold" %>
         <div class="d-flex align-items-center gap-2">
           <% if current_customer %>
-            <span class="navbar-text">RFC: <%= current_customer.rfc %></span>
+            <% if current_user_profile.present? %>
+              <span class="navbar-text d-flex align-items-center gap-2">
+                <% if current_user_profile.image_url.present? %>
+                  <%= image_tag current_user_profile.image_url, size: "28x28",
+                      class: "rounded-circle", alt: current_user_profile.full_name %>
+                <% end %>
+                <%= current_user_profile.full_name %>
+              </span>
+            <% else %>
+              <span class="navbar-text">RFC: <%= current_customer.rfc %></span>
+            <% end %>
             <%= button_to "Log out", session_path, method: :delete,
                 class: "btn btn-outline-secondary btn-sm" %>
           <% else %>
@@ -36,6 +46,9 @@
       <% end %>
       <% if alert %>
         <div class="alert alert-danger mb-0 mt-3"><%= alert %></div>
+      <% end %>
+      <% if flash[:welcome] %>
+        <div hidden data-controller="welcome" data-welcome-message-value="<%= flash[:welcome] %>"></div>
       <% end %>
     </div>
 

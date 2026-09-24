@@ -59,8 +59,55 @@ RSpec.describe "Authentication flow", type: :request do
     post "/session", params: { rfc: customer.rfc }
 
     get "/invoices"
-    expect(response.body).to include(customer.rfc)
+    expect(response.body).to include("Emily Johnson")
     expect(response.body).to include("Log out")
     expect(response.body).not_to include("Log in")
+    expect(response.body).not_to include("RFC: #{customer.rfc}")
+  end
+
+  it "shows the profile that belongs to the logged-in customer" do
+    customer = create(:customer, rfc: "ABC220101XYZ")
+    WebMock.reset!
+    stub_request(:get, "https://dummyjson.com/users/#{customer.id}").to_return(
+      status: 200,
+      body: {
+        firstName: "Juan",
+        lastName: "Pérez",
+        image: "https://dummyjson.com/icon/juan/128"
+      }.to_json,
+      headers: { "Content-Type" => "application/json" })
+
+    post "/session", params: { rfc: customer.rfc }
+
+    get "/customers/#{customer.id}"
+
+    expect(WebMock).to have_requested(:get, "https://dummyjson.com/users/#{customer.id}")
+    expect(response.body).to include("Welcome, Juan Pérez")
+    expect(response.body).to include('data-welcome-message-value="Welcome, Juan Pérez')
+    expect(response.body).to include("https://dummyjson.com/icon/juan/128")
+  end
+
+  it "shows the welcome toast once per login, not on later page loads" do
+    customer = create(:customer, rfc: "ABC220101XYZ")
+
+    post "/session", params: { rfc: customer.rfc }
+
+    get "/customers/#{customer.id}"
+    expect(response.body).to include("data-welcome-message-value=\"Welcome, Emily Johnson")
+
+    get "/customers/#{customer.id}"
+    expect(response.body).not_to include("data-welcome-message-value=")
+  end
+
+  it "keeps the RFC in the navbar when the profile API is unavailable" do
+    customer = create(:customer, rfc: "ABC220101XYZ")
+    stub_request(:get, DUMMY_USERS_URL).to_return(status: 500, body: "{}")
+
+    post "/session", params: { rfc: customer.rfc }
+    expect(response).to redirect_to("/customers/#{customer.id}")
+
+    get "/invoices"
+    expect(response.body).to include("RFC: #{customer.rfc}")
+    expect(response.body).not_to include("Emily Johnson")
   end
 end

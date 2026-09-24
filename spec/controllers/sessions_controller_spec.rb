@@ -26,6 +26,33 @@ RSpec.describe SessionsController, type: :controller do
 
         expect(session[:customer_id]).to eq(customer.id)
       end
+
+      it "stores the fetched user profile in the session" do
+        post :create, params: { rfc: "abc220101xyz" }
+
+        expect(session[:user_profile]).to eq(
+          "full_name" => "Emily Johnson",
+          "image_url" => "https://dummyjson.com/icon/emilys/128")
+      end
+
+      it "sets a one-shot welcome flash message" do
+        post :create, params: { rfc: "abc220101xyz" }
+
+        expect(flash[:welcome]).to eq("Welcome, Emily Johnson. It's so great to see you again.")
+      end
+    end
+
+    context "when the profile API fails" do
+      it "still logs in but leaves the profile out of the session" do
+        stub_request(:get, DUMMY_USERS_URL).to_return(status: 500, body: "{}")
+
+        post :create, params: { rfc: "abc220101xyz" }
+
+        expect(session[:customer_id]).to eq(customer.id)
+        expect(session[:user_profile]).to be_nil
+        expect(flash[:welcome]).to be_nil
+        expect(response).to redirect_to(customer_path(customer))
+      end
     end
 
     context "with an unknown RFC" do
@@ -51,10 +78,12 @@ RSpec.describe SessionsController, type: :controller do
   describe "DELETE #destroy" do
     it "clears the session and redirects to the login page" do
       session[:customer_id] = create(:customer).id
+      session[:user_profile] = { "full_name" => "Emily Johnson", "image_url" => "avatar" }
 
       delete :destroy
 
       expect(session[:customer_id]).to be_nil
+      expect(session[:user_profile]).to be_nil
       expect(response).to redirect_to(root_path)
     end
   end

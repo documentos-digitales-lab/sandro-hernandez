@@ -2,7 +2,7 @@ class InvoicesController < ApplicationController
   before_action :require_customer, only: [:new, :create, :index, :show]
 
   def index
-    @invoices = current_customer.invoices.order(created_at: :desc)
+    @invoices = current_customer.invoices.includes(:items).order(created_at: :desc)
   end
 
   def new

@@ -32,14 +32,16 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem "rspec-rails", "~> 4.0.0.beta2"
+  gem 'bullet'
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
   gem 'awesome_print'
-  gem 'bullet'
   gem 'dotenv-rails'
+  gem 'pry'
+  gem 'pry-nav'
 end
 
 group :test do

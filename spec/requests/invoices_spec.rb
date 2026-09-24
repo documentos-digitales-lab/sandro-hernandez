@@ -76,7 +76,7 @@ RSpec.describe "Invoices", type: :request do
 
   describe "GET /invoices" do
     it "lists only the current customer's invoices" do
-      mine = create_list(:invoice, 2, customer: customer)
+      mine = create_list(:invoice, 2, :with_item, customer: customer)
       create_list(:invoice, 2, customer: other_customer)
 
       get "/invoices"
@@ -84,6 +84,7 @@ RSpec.describe "Invoices", type: :request do
       expect(response).to have_http_status(:ok)
       mine.each { |invoice| expect(response.body).to include(invoice.uuid) }
       expect(response.body).to include("2 invoice(s) for RFC #{customer.rfc}")
+      expect(response.body).to include("1 product")
     end
 
     it "shows an empty state when the customer has no invoices" do

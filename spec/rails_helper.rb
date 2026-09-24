@@ -26,6 +26,22 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
+
+  if Bullet.enable?
+    config.before(:each) do
+      Bullet.start_request
+    end
+
+    config.after(:each) do |example|
+      # Controller specs do not render views, so Bullet can only report false
+      # positives there (e.g. "avoid eager loading"); requests/features cover
+      # the rendered templates where real N+1 queries surface.
+      if Bullet.notification? && example.metadata[:type] != :controller
+        Bullet.perform_out_of_channel_notifications
+      end
+      Bullet.end_request
+    end
+  end
 end
 
 Shoulda::Matchers.configure do |config|

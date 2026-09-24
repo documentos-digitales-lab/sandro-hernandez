@@ -1,8 +1,13 @@
 class InvoicesController < ApplicationController
+  include Pagy::Backend
   before_action :require_customer, only: [:new, :create, :index, :show]
 
   def index
-    @invoices = current_customer.invoices.includes(:items).order(created_at: :desc)
+    @pagy, @invoices = pagy(
+      current_customer.invoices.order(created_at: :desc),
+      items: 20)
+    invoice_ids = @invoices.to_a.map(&:id)
+    @products_count_by_invoice = Item.where(invoice_id: invoice_ids).group(:invoice_id).count
   end
 
   def new
@@ -15,24 +20,26 @@ class InvoicesController < ApplicationController
     if @invoice.save
       redirect_to invoice_path(@invoice)
     else
-      fill_missing_items
-      render :new, status: :unprocessable_entity
+      render_new_with_items
     end
   rescue ActiveRecord::RecordNotUnique
     redirect_to invoice_path(current_customer.invoices.find_by!(uuid: @invoice.uuid))
   rescue ActionController::ParameterMissing
     @invoice = current_customer.invoices.new
-    fill_missing_items
-    render :new, status: :unprocessable_entity
+    render_new_with_items
   end
 
   def show
     @invoice = current_customer.invoices.find_by!(uuid: params[:uuid])
-    @taxes = InvoiceTaxCalculator.call(@invoice)
     @additional_taxes = AdditionalTaxesChecker.call(@invoice)
   end
 
   private
+
+  def render_new_with_items
+    fill_missing_items
+    render :new, status: :unprocessable_entity
+  end
 
   def fill_missing_items
     return if @invoice.items.size >= 2

@@ -2,7 +2,7 @@
   <div class="d-flex align-items-end justify-content-between mb-4">
     <div>
       <h1 class="fw-bold mb-1">Invoices</h1>
-      <p class="text-muted mb-0"><%= @invoices.size %> invoice(s) for RFC <%= current_customer.rfc %></p>
+      <p class="text-muted mb-0"><%= pluralize(@pagy.count, "invoice") %> for RFC <%= current_customer.rfc %></p>
     </div>
     <%= link_to "Create An Invoice", new_invoice_path, class: "btn btn-primary py-2 fw-semibold" %>
   </div>
@@ -23,13 +23,15 @@
           <tr>
             <td class="font-monospace text-muted small"><%= invoice.uuid %></td>
             <td><%= l invoice.created_at, format: :long %></td>
-            <td><%= pluralize(invoice.items.size, "product") %></td>
-            <td class="text-end fw-semibold"><%= number_to_currency(InvoiceTaxCalculator.call(invoice).total) %></td>
+            <td><%= pluralize(@products_count_by_invoice[invoice.id] || 0, "product") %></td>
+            <td class="text-end fw-semibold"><%= number_to_currency(invoice.total) %></td>
             <td class="text-end"><%= link_to "View", invoice_path(invoice), class: "btn btn-outline-secondary btn-sm" %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
+
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
   <% else %>
     <div class="alert alert-secondary">No invoices yet.</div>
   <% end %>

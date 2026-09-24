@@ -14,7 +14,7 @@
       </tr>
     </thead>
     <tbody>
-      <% items.each_with_index do |item, index| %>
+      <% invoice.items.each_with_index do |item, index| %>
         <tr>
           <td class="fw-semibold">Item No. <%= index + 1 %></td>
           <td><%= item.description %></td>
@@ -25,15 +25,15 @@
       <% end %>
       <tr>
         <td colspan="4" class="text-end">Subtotal</td>
-        <td class="text-end"><%= number_to_currency(taxes.subtotal) %></td>
+        <td class="text-end"><%= number_to_currency(invoice.subtotal) %></td>
       </tr>
       <tr>
         <td colspan="4" class="text-end">Tax</td>
-        <td class="text-end"><%= number_to_currency(taxes.tax) %></td>
+        <td class="text-end"><%= number_to_currency(invoice.tax) %></td>
       </tr>
       <tr>
         <td colspan="4" class="text-end fw-semibold">Total</td>
-        <td class="text-end fw-semibold"><%= number_to_currency(taxes.total) %></td>
+        <td class="text-end fw-semibold"><%= number_to_currency(invoice.total) %></td>
       </tr>
     </tbody>
   </table>

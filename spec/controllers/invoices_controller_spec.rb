@@ -135,14 +135,17 @@ RSpec.describe InvoicesController, type: :controller do
   describe "GET #show" do
     before { session[:customer_id] = customer.id }
 
-    it "finds the invoice by uuid and computes taxes" do
-      invoice = create(:invoice, customer: customer, uuid: "abc-123")
-      invoice.items.create!(description: "Laptop", quantity: 1, unit_price: 1000)
+    it "finds the invoice by uuid and reads its persisted totals" do
+      invoice = build(:invoice, customer: customer, uuid: "abc-123")
+      invoice.items.build(description: "Laptop", quantity: 1, unit_price: 1000)
+      invoice.save!(validate: false)
 
       get :show, params: { uuid: invoice.uuid }
 
       expect(assigns(:invoice)).to eq(invoice)
-      expect(assigns(:taxes).total).to eq(BigDecimal("1160"))
+      expect(assigns(:invoice).subtotal).to eq(BigDecimal("1000"))
+      expect(assigns(:invoice).tax).to eq(BigDecimal("160"))
+      expect(assigns(:invoice).total).to eq(BigDecimal("1160"))
       expect(assigns(:additional_taxes)).to be false
       expect(response).to render_template(:show)
     end

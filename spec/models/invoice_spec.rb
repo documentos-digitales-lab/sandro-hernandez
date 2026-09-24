@@ -31,6 +31,32 @@ RSpec.describe Invoice, type: :model do
     end
   end
 
+  describe "persisted totals" do
+    it "stores subtotal, tax and total computed from its items" do
+      invoice = Invoice.new(customer: customer)
+      invoice.items.build(description: "Laptop", quantity: 2, unit_price: 100)
+      invoice.items.build(description: "Monitor", quantity: 1, unit_price: 50)
+      invoice.save!
+
+      invoice.reload
+
+      expect(invoice.subtotal).to eq(BigDecimal("250.00"))
+      expect(invoice.tax).to eq(BigDecimal("40.00"))
+      expect(invoice.total).to eq(BigDecimal("290.00"))
+    end
+
+    it "keeps the stored totals consistent with the tax calculator" do
+      invoice = Invoice.new(customer: customer)
+      invoice.items.build(description: "Laptop", quantity: 1, unit_price: 1000)
+      invoice.save!
+
+      result = InvoiceTaxCalculator.call(invoice)
+
+      expect(invoice.reload.total).to eq(result.total)
+      expect(invoice.total).to eq(BigDecimal("1160.00"))
+    end
+  end
+
   describe "to_param" do
     it "returns the uuid" do
       invoice = build(:invoice, uuid: "abc-123")
